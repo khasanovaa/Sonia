@@ -1,30 +1,32 @@
-# Sonia
-Нейронной сеть, сочиняющая музыку.
+# SONIA - sensuous original network invents audio
 
-RNN будет реализована по статье "This Time with Feeling: Learning Expressive Musical Performance"
-(https://arxiv.org/abs/1808.03715)
+Here you can find implemented RNN that composes music.
 
-План реализации и оценка сроков:
 
-1. --14.02--
-Разобрать статью до конца 
+For training this RNN I used samples in boogie-woogie style. You can find it in /Samples directory. 
+
+
+You can check generated samples here: https://drive.google.com/open?id=1Ny8rjikoj6Xp7_9eKGzicqCz4fMV-9Bq
+
+
+Or try to create music by yourself!
+
+
+For using it the following libraries need to be installed:
+
+ `numpy`, `midi2audio`, `mido`, `torch`, `os`
  
- 
-2. --24.02--
-Осознать ввод и вывод: перевод входного формата Midi в удобный для обучения вид и обратно, сохранив его.
+ (You can download them using `pip3 install name_of_library`).
+
+After all libraries installed:
+
+1) clone repository
+
+2) run `python3 run.py` from Sonia directory
+
+3) enter any integer number
+
+4) now you can find 2 files in .midi and .wav format at current directory
 
 
-3. --24.02--
-Написать простую нейронку, обученную на похожих друг на друга произведениях (ноктюрны Шопена/джазовые исполнения/полифонии Баха и т.д.)
-
-4. --10.03--
-Реализовать RNN из статьи, оценить качество на ней.
-
-5. --15.03--
-Попробовать поменять различные параметры, пообучать на них, оценить качество, выяснить лучшии.
-
-6. --20.03--
-Обучить на других группах похожих произведений.
-
-7. ~Конец марта--
-Визуализация
+This project was implemented basing on "This Time with Feeling: Learning Expressive Musical Performance" article (https://arxiv.org/abs/1808.03715).

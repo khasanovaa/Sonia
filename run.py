@@ -1,6 +1,5 @@
 import numpy as np
 from numpy import exp
-# from numpy import random
 import mido
 from mido import MidiTrack
 from mido import MidiFile, MetaMessage
@@ -8,20 +7,20 @@ from midi2audio import FluidSynth
 import torch
 import os
 import torch.nn as nn
-# import time
 from torch import optim
 import torch.nn.functional as F
-device =  torch.device('cpu')
-tempo =2000000
+
+device = torch.device('cpu')
+tempo = 2000000
 count = 0
 hid_size = 512
 time_cl = [0, 1, 2, 3, 5, 7, 11, 15, 20, 23, 35, 80, 122, 187]
 vel_cl = [0, 15, 33, 64, 80, 104, 125]
 note_cl = [52, 48, 55, 67, 64, 60, 57, 69, 70, 58, 63, 51, 50, 65, 66, 68, 53, 72, 74, 62, 75, 36, 76, 79, 43, 31, 39, 40, 71, 45, 73, 34, 35, 38, 29, 32, 33, 41, 44, 77, 81, 37, 59, 47, 46, 82, 84, 87, 88, 100, 94, 98, 96, 86, 93, 91, 101, 80, 89, 83, 99, 42, 78, 90, 54, 56, 49, 28, 26, 61, 30, 85, 92, 95, 27, 24, 97, 103, 22, 102, 105, 107, 108, 104, 106]
 SOS_token = len(note_cl)*2 + len(time_cl) + len(vel_cl)
+
 def evaluate(decoder, decoder_hidden):
     with torch.no_grad():
-
         target_length =1000
         outputs = []
         decoder_input = torch.tensor([[SOS_token]]).to(device)
@@ -33,13 +32,10 @@ def evaluate(decoder, decoder_hidden):
             decoder_input = torch.tensor([[topi[0].item()]]).to(device)
         return outputs
 
-
-
 def postprocess(v, seed):
     global count
     d = decoding(v)
     events = d
-    
     for i in range(len(events)):
         event = events[i]
         if (event[0] == 'v'):
@@ -64,14 +60,12 @@ def postprocess(v, seed):
     mid_f = MidiFile()
     mid_f.tracks.append(track)
     mid_f.save('output_' + str(seed) + '.mid')
-    count+=1
-
+    count += 1
 
 class DecoderRNN(nn.Module):
     def __init__(self, hidden_size, output_size):
         super(DecoderRNN, self).__init__()
         self.hidden_size = hidden_size
-
         self.embedding = nn.Embedding(output_size, hidden_size)
         self.gru = nn.GRU(hidden_size, hidden_size)
         self.out = nn.Linear(hidden_size, output_size)
@@ -84,21 +78,17 @@ class DecoderRNN(nn.Module):
         output = self.softmax(self.out(output[0]))
         return output, hidden
 
-
 def process(seed):
     hid_size = 512
     classes = SOS_token + 1
-
     np.random.seed(seed)
     decoder = DecoderRNN(hid_size, classes)
     decoder.load_state_dict(torch.load("decoders/decoder4", map_location='cpu'))
     decoder_hidden = torch.FloatTensor([np.random.rand() for _ in range(hid_size)]).view(1,1,-1).to(device)
     postprocess(evaluate(decoder, decoder_hidden), seed)
-
     fs = FluidSynth(os.getcwd() + '/GeneralUser_GS_SoftSynth_v144.sf2')
     fs.midi_to_audio('output_' + str(seed) + '.mid', 'new_song_' + str(seed) + '.wav')
     
-
 def decoding(ans):
     events = []
     for n in ans:
@@ -111,7 +101,6 @@ def decoding(ans):
         else:
             events.append(['nof', n - len(vel_cl) - len(time_cl) - len(note_cl)])
     return events
-
 
 print("print seed")
 seed = int(input())
